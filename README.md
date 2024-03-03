@@ -1,4 +1,1 @@
-# palbuddies
-
-* own palworld server setup
-* uses hetzner hcloud
+# hetzner for dummies
