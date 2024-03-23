@@ -8,6 +8,8 @@ resource "hcloud_server" "server" {
     type = var.service
   }
   user_data = file("user_data.yml")
+
+  firewall_ids = [ hcloud_firewall.firewall_deny.id, hcloud_firewall.firewall_allow.id]
 }
 
 resource "hcloud_network" "hc_private" {
@@ -30,4 +32,50 @@ resource "hcloud_network_subnet" "hc_private_subnet" {
 resource "hcloud_ssh_key" "key" {
   name       = "${var.service}-key"
   public_key = var.ssh_public_key
+}
+
+resource "hcloud_firewall" "firewall_deny" {
+  name = "${var.service}-deny"
+}
+
+resource "hcloud_firewall" "firewall_allow" {
+  name = "${var.service}-allow"
+
+  rule {
+    direction  = "in"
+    protocol   = "udp"
+    port       = "22"
+    source_ips = [
+      "0.0.0.0/0",
+      "::/0"
+    ]
+  }
+  rule {
+    direction  = "out"
+    protocol   = "udp"
+    port       = "22"
+    source_ips = [
+      "0.0.0.0/0",
+      "::/0"
+    ]
+  }
+  rule {
+    direction  = "in"
+    protocol   = "tcp"
+    port       = "80"
+    source_ips = [
+      "0.0.0.0/0",
+      "::/0"
+    ]
+  }
+  rule {
+    direction  = "out"
+    protocol   = "tcp"
+    port       = "80"
+    source_ips = [
+      "0.0.0.0/0",
+      "::/0"
+    ]
+  }
+
 }
