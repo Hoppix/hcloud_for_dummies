@@ -1,8 +1,6 @@
 
 locals {
-  service = "palbuddie"
-  server_type = "CX21"
+  service = "default"
+  server_type = "cx11"
   image = "ubuntu-22.04"
-  region = "eu-central"
-  port = 8211
 }
