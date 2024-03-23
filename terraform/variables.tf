@@ -3,6 +3,20 @@ variable "hcloud_token" {
   sensitive = true
 }
 
+variable "service" {
+  type = string
+  default = "default"
+}
+
+variable "ssh_user" {
+  type = string
+  default = "default"
+}
+
+variable "ssh_public_key" {
+  type = string
+}
+
 variable "location" {
   default = "nbg1"
 }

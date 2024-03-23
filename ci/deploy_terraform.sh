@@ -17,18 +17,35 @@ fi
 cd "$(dirname "$0")"
 
 main() {
-
   source ../.env
-  action=$1
-  log "calling deploy_terraform.sh with action: $action"
+  log "Running with $0"
+
+  local ACTION=$1
+
+  pushd ~/.ssh
+  local SSH_PUBLIC_KEY=$(setup_ssh)
+  log "SSH Public key is: $SSH_PUBLIC_KEY"
+  popd 
 
   export TF_VAR_hcloud_token=$HCLOUD_TOKEN
+  export TF_VAR_service=$SERVICE
+  export TF_VAR_ssh_user=$SERVICE
+  export TF_VAR_ssh_public_key=$SSH_PUBLIC_KEY
 
-  log "token is $TF_VAR_hcloud_token"
-
+  log "Running terraform with action: $ACTION"
   pushd ../terraform/
-  terraform $action
+  terraform $ACTION
   popd
+}
+
+setup_ssh() {
+  local SSH_FILE="hcloud_$SERVICE"
+
+  if [ ! -f $SSH_FILE ]; then
+    ssh-keygen -f $SSH_FILE -t rsa -b 4096 -N ''
+  fi
+  local PUBLIC_KEY=$(cat "$SSH_FILE.pub")
+  echo $PUBLIC_KEY
 }
 
 log() {

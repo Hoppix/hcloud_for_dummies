@@ -1,23 +1,23 @@
+
 #cloud-config
 users:
-  - name: devops
+  - name: ${ssh_user}
     groups: users, admin
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
     ssh_authorized_keys:
-      - ssh-rsa <key>
+      - ${ssh_public_key}
 package_update: true
 package_upgrade: true
 packages:
   - nginx
   - fail2ban
   - ufw
-  - docker
 runcmd:
   - systemctl enable nginx
   - ufw allow 'Nginx HTTP'
   - printf "[sshd]\nenabled = true\nbanaction = iptables-multiport" > /etc/fail2ban/jail.local
-  - systemctl enable fail2ban
+  - systemctl enable fail2bank
   - systemctl start fail2ban
   - ufw allow 'OpenSSH'
   - ufw enable
@@ -28,7 +28,6 @@ runcmd:
   - sed -ie '/^#AllowTcpForwarding/s/^.*$/AllowTcpForwarding no/' /etc/ssh/sshd_config
   - sed -ie '/^#AllowAgentForwarding/s/^.*$/AllowAgentForwarding no/' /etc/ssh/sshd_config
   - sed -ie '/^#AuthorizedKeysFile/s/^.*$/AuthorizedKeysFile .ssh/authorized_keys/' /etc/ssh/sshd_config
-  - sed -i '$a AllowUsers devops' /etc/ssh/sshd_config
+  - sed -i '$a AllowUsers ${ssh_user}' /etc/ssh/sshd_config
   - systemctl restart ssh
-  - rm /var/www/html/*
-  - echo "hcloud for dummies!" >>/var/www/html/index.html
+
